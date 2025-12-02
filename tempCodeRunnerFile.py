@@ -1,4 +1,4 @@
-# app.py — versão corrigida para deploy no Vercel
+# presell_criptos.py — versão melhorada e profissional com correção de imagem
 from flask import Flask, render_template_string
 import os
 import base64
@@ -7,41 +7,61 @@ app = Flask(__name__)
 
 AFFILIATE_URL = "https://app.monetizze.com.br/r/AKG24444623?u=c&pl=TT167934"
 
-# FUNÇÃO PARA CARREGAR A IMAGEM EM BASE64 (com tratamento de erros)
+# FUNÇÃO PARA CARREGAR A IMAGEM EM BASE64
 def load_logo_as_base64():
     """
-    Tenta carregar a imagem e converter para Base64.
-    Retorna string Base64 ou None se não encontrar.
+    Tenta carregar a imagem logo.png (ou variações) e converter para Base64.
+    Retorna a string Base64 ou None se não encontrar.
     """
+    # Lista de possíveis nomes de arquivo de imagem
     possible_names = [
         'logo.png', 'Logo.png', 'logo.jpg', 'Logo.jpg', 
-        'logo.jpeg', 'Logo.jpeg', 'image.png', 'Image.png'
+        'logo.jpeg', 'Logo.jpeg', 'image.png', 'Image.png',
+        'logo.webp', 'Logo.webp'
     ]
     
     for filename in possible_names:
         if os.path.exists(filename):
             try:
+                print(f"✅ Encontrada imagem: {filename}")
                 with open(filename, 'rb') as image_file:
+                    # Converter para base64
                     encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
                 
-                # Determinar tipo MIME
+                # Determinar o tipo MIME da imagem
                 if filename.lower().endswith('.png'):
                     mime_type = 'png'
                 elif filename.lower().endswith('.jpg') or filename.lower().endswith('.jpeg'):
                     mime_type = 'jpeg'
+                elif filename.lower().endswith('.webp'):
+                    mime_type = 'webp'
                 else:
                     mime_type = 'png'
                 
+                # Retornar string Base64 formatada
                 return f"data:image/{mime_type};base64,{encoded_string}"
                 
             except Exception as e:
-                # Log silencioso para produção
-                pass
+                print(f"⚠️ Erro ao ler {filename}: {e}")
     
-    return None  # Retorna None se não encontrar imagem
+    print("⚠️ Nenhuma imagem encontrada. Usando placeholder.")
+    return None
 
-# Carregar a imagem
+# Carregar a imagem uma vez ao iniciar
 LOGO_BASE64 = load_logo_as_base64()
+
+# Exibir informações de debug
+print("\n" + "="*60)
+print("🎯 LANDING PAGE - CURSO DE CRIPTOMOEDAS")
+print("="*60)
+print(f"🔗 URL do afiliado: {AFFILIATE_URL}")
+print(f"🖼️  Logo carregada: {'SIM' if LOGO_BASE64 else 'NÃO'}")
+print("📁 Arquivos na pasta atual:")
+for f in os.listdir('.'):
+    if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.gif')):
+        size = os.path.getsize(f)
+        print(f"   📸 {f} ({size:,} bytes)")
+print("="*60 + "\n")
 
 TEMPLATE = """
 <!doctype html>
@@ -349,7 +369,7 @@ TEMPLATE = """
                     <h3>💰 CURSO DE CRIPTOMOEDAS</h3>
                     <p>Domine o Mercado Digital</p>
                     <p style="font-size: 0.8rem; margin-top: 10px; color: #ffd700;">
-                        Logo não encontrado - usando placeholder
+                        ⚠️ Coloque um arquivo "logo.png" na pasta do script
                     </p>
                 </div>
                 {% endif %}
@@ -478,6 +498,11 @@ TEMPLATE = """
             
             setTimeout(typeWriter, 2000);
         });
+        
+        // DEBUG NO CONSOLE
+        console.log("=== DEBUG DA PÁGINA ===");
+        console.log("URL do Afiliado:", "{{affiliate}}");
+        console.log("Logo carregada:", {% if logo_base64 %}"SIM"{% else %}"NÃO (usando placeholder)"{% endif %});
     </script>
 </body>
 </html>
@@ -492,14 +517,14 @@ def index():
         logo_base64=LOGO_BASE64
     )
 
-# Rota de health check (recomendada para Vercel)
-@app.route('/health')
-def health():
-    return 'OK', 200
-
-# PONTO DE ENTRADA ÚNICO E CORRETO PARA VERCEL
-# Importante: apenas UM if __name__ == '__main__' no final
 if __name__ == '__main__':
-    # Usa porta da variável de ambiente (Vercel) ou 5000 localmente
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)  # debug=False para produção
+    print("🌐 Servidor iniciando...")
+    print("🔗 Acesse: http://localhost:5000")
+    print("🔄 Atualize a página se a imagem não aparecer")
+    print("💡 Dica: Certifique-se de que 'logo.png' está na mesma pasta\n")
+    
+    app.run(debug=True, port=5000)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
