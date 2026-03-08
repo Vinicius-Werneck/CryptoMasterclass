@@ -1,97 +1,79 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, url_for
 import os
-import base64
 
 app = Flask(__name__)
 
 AFFILIATE_URL = "https://app.monetizze.com.br/r/AKG24444623?u=c&pl=TT167934"
 
 SITE_URL = "https://crypto-masterclass.vercel.app"
-PREVIEW_IMAGE = f"{SITE_URL}/preview.png"
-
-
-def load_logo_as_base64():
-    possible_names = [
-        'logo.png','Logo.png','logo.jpg','Logo.jpg',
-        'logo.jpeg','Logo.jpeg','image.png','Image.png'
-    ]
-
-    for filename in possible_names:
-        if os.path.exists(filename):
-            try:
-                with open(filename, 'rb') as image_file:
-                    encoded = base64.b64encode(image_file.read()).decode("utf-8")
-
-                if filename.lower().endswith(".png"):
-                    mime = "png"
-                else:
-                    mime = "jpeg"
-
-                return f"data:image/{mime};base64,{encoded}"
-
-            except:
-                pass
-
-    return None
-
-
-LOGO_BASE64 = load_logo_as_base64()
-
 
 TEMPLATE = """
-
 <!doctype html>
-<html lang='pt-BR'>
+<html lang="pt-BR">
 <head>
 
-<meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Curso de Criptomoedas para Iniciantes</title>
 
-<meta name="description" content="Aprenda a investir em criptomoedas com segurança e dominar o mercado digital.">
+<meta name="description" content="Aprenda do zero ao avançado como investir em criptomoedas com segurança e aproveitar as oportunidades do mercado digital.">
 
-<!-- Open Graph (WhatsApp / Facebook / Telegram) -->
-<meta property="og:title" content="Curso de Criptomoedas para Iniciantes">
-<meta property="og:description" content="Aprenda do zero ao avançado como lucrar no mercado cripto.">
-<meta property="og:image" content="{{preview}}">
+<!-- Open Graph -->
 <meta property="og:url" content="{{site_url}}">
 <meta property="og:type" content="website">
+<meta property="og:title" content="Curso de Criptomoedas para Iniciantes">
+<meta property="og:description" content="Aprenda do zero ao avançado como lucrar no mercado cripto.">
+<meta property="og:image" content="{{preview_image}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 
-<!-- Twitter / WhatsApp fallback -->
+<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Curso de Criptomoedas para Iniciantes">
-<meta name="twitter:description" content="Aprenda a investir em criptomoedas com segurança.">
-<meta name="twitter:image" content="{{preview}}">
+<meta name="twitter:description" content="Aprenda do zero ao avançado como lucrar no mercado cripto.">
+<meta name="twitter:image" content="{{preview_image}}">
 
 <style>
 
 body{
-font-family: Arial;
-background:#0f2a52;
+font-family: Arial, Helvetica, sans-serif;
+background: linear-gradient(135deg,#1e3c72,#2a5298);
 color:white;
+margin:0;
+padding:40px;
 text-align:center;
-padding:40px
+}
+
+.container{
+max-width:900px;
+margin:auto;
 }
 
 h1{
-font-size:40px
+font-size:42px;
+margin-bottom:20px;
+}
+
+.subtitle{
+font-size:20px;
+margin-bottom:40px;
 }
 
 .btn{
 display:inline-block;
 padding:20px 40px;
-background:#00e6b0;
-color:#001f1d;
+font-size:22px;
 font-weight:bold;
+color:#001f1d;
+background:#00e6b0;
+border-radius:12px;
 text-decoration:none;
-border-radius:10px;
-margin-top:30px
+transition:0.2s;
 }
 
-.logo{
-max-width:400px;
-margin-bottom:30px
+.btn:hover{
+transform:scale(1.05);
 }
 
 </style>
@@ -100,45 +82,45 @@ margin-bottom:30px
 
 <body>
 
-{% if logo_base64 %}
-<img src='{{logo_base64}}' class="logo">
-{% endif %}
+<div class="container">
 
 <h1>Domine o Mercado de Criptomoedas</h1>
 
-<p>
-Aprenda do zero como investir em criptomoedas
-e começar sua jornada no mercado digital.
+<p class="subtitle">
+Aprenda do zero como investir em Bitcoin, Ethereum e outras criptomoedas
+com segurança.
 </p>
 
 <a href="{{affiliate}}" class="btn" target="_blank">
-GARANTIR MINHA VAGA
+QUERO COMEÇAR AGORA
 </a>
+
+</div>
 
 </body>
 </html>
-
 """
 
 
-@app.route('/')
-def index():
+@app.route("/")
+def home():
+
+    preview_image = SITE_URL + url_for("static", filename="preview.png")
 
     return render_template_string(
         TEMPLATE,
         affiliate=AFFILIATE_URL,
-        logo_base64=LOGO_BASE64,
-        preview=PREVIEW_IMAGE,
+        preview_image=preview_image,
         site_url=SITE_URL
     )
 
 
-@app.route('/health')
+@app.route("/health")
 def health():
     return "OK",200
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     port = int(os.environ.get("PORT",5000))
 
