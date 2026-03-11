@@ -1,11 +1,21 @@
 # app.py — versão corrigida com Open Graph tags
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, send_file
 import os
 import base64
 
 app = Flask(__name__, static_folder='static')
 
 AFFILIATE_URL = "https://app.monetizze.com.br/r/AKG24444623?u=c&pl=TT167934"
+
+# URLs do site e imagem
+SITE_URL = "https://crypto-masterclass.vercel.app"
+
+# OPÇÃO: Usando Imgur (mais fácil e confiável)
+# Substitua o código abaixo pela URL direta da sua imagem no Imgur
+IMAGE_URL = "https://i.imgur.com/zm84QHH.jpeg"  # <-- COLOQUE A URL DIRETA AQUI
+
+# Caso prefira usar a imagem local (descomente a linha abaixo e comente a de cima)
+# IMAGE_URL = f"{SITE_URL}/static/og-image.jpg"
 
 # FUNÇÃO PARA CARREGAR A IMAGEM EM BASE64 (para exibição no site)
 def load_logo_as_base64():
@@ -42,12 +52,6 @@ def load_logo_as_base64():
 # Carregar a imagem base64 para uso no site
 LOGO_BASE64 = load_logo_as_base64()
 
-# URL PÚBLICA da sua imagem (você PRECISA disso para o WhatsApp)
-# Opção 1: Hospedar a imagem em um serviço como Imgur, Cloudinary, etc.
-# Opção 2: Criar uma rota no Flask para servir a imagem (recomendado)
-SITE_URL = "https://crypto-masterclass.vercel.app"  
-IMAGE_URL = f"{SITE_URL}/static/og-image.jpg"  # URL pública da imagem
-
 TEMPLATE = """
 <!doctype html>
 <html lang='pt-BR'>
@@ -80,7 +84,7 @@ TEMPLATE = """
     <meta name="twitter:image" content="{{ image_url }}">
     
     <style>
-        /* SEU CSS EXISTENTE - NÃO ALTERADO */
+        /* FUNDO GRADIENTE AZUL ANIMADO */
         @keyframes gradientMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -428,13 +432,8 @@ TEMPLATE = """
             
             <div class='benefit-card'>
                 <h3>🎯 Estratégias Comprovadas</h3>
-                <p>Metodologias testadas e aprovadas.</p>
+                <p>Metodologias testadas e aprovadas por mais de 2.300 alunos.</p>
             </div>
-            
-            <!-- <div class='benefit-card'>
-                <h3>💼 Suporte Individual</h3>
-                <p>Tire todas suas dúvidas diretamente com nossos especialistas em criptomoedas.</p>
-            </div> -->
         </section>
 
         <section class='cta-section'>
@@ -522,12 +521,14 @@ def index():
         site_url=SITE_URL
     )
 
-# Rota para servir a imagem OG (se você optar por hospedar localmente)
+# Rota para servir a imagem OG (apenas se você usar a opção local)
 @app.route('/static/og-image.jpg')
 def serve_og_image():
     """Serve a imagem para o Open Graph"""
-    from flask import send_file
-    return send_file('og-image.jpg', mimetype='image/jpeg')
+    try:
+        return send_file('static/og-image.jpg', mimetype='image/jpeg')
+    except Exception as e:
+        return f"Erro ao carregar imagem: {e}", 404
 
 # Rota de health check
 @app.route('/health')
