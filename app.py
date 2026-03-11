@@ -3,7 +3,7 @@ from flask import Flask, render_template_string
 import os
 import base64
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 AFFILIATE_URL = "https://app.monetizze.com.br/r/AKG24444623?u=c&pl=TT167934"
 
