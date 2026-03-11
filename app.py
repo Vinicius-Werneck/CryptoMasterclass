@@ -45,8 +45,7 @@ LOGO_BASE64 = load_logo_as_base64()
 # URL PÚBLICA da sua imagem (você PRECISA disso para o WhatsApp)
 # Opção 1: Hospedar a imagem em um serviço como Imgur, Cloudinary, etc.
 # Opção 2: Criar uma rota no Flask para servir a imagem (recomendado)
-SITE_URL = "https://crypto-masterclass.vercel.app".rstrip('/') 
-IMAGE_URL = f"{SITE_URL}/static/og-image.jpg"  # URL pública da imagem
+IMAGE_URL = "https://crypto-masterclass.vercel.app/static/og-image.jpg"
 
 TEMPLATE = """
 <!doctype html>
