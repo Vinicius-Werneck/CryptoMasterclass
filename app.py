@@ -12,7 +12,7 @@ SITE_URL = "https://crypto-masterclass.vercel.app"
 
 # OPÇÃO: Usando Imgur (mais fácil e confiável)
 # Substitua o código abaixo pela URL direta da sua imagem no Imgur
-IMAGE_URL = "https://i.imgur.com/vBoxaTT.jpeg"  # <-- COLOQUE A URL DIRETA AQUI
+IMAGE_URL = ""  
 
 # Caso prefira usar a imagem local (descomente a linha abaixo e comente a de cima)
 # IMAGE_URL = f"{SITE_URL}/static/og-image.jpg"
