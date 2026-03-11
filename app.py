@@ -1,4 +1,4 @@
-# app.py — versão corrigida para deploy no Vercel
+# app.py — versão corrigida com Open Graph tags
 from flask import Flask, render_template_string
 import os
 import base64
@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 AFFILIATE_URL = "https://app.monetizze.com.br/r/AKG24444623?u=c&pl=TT167934"
 
-# FUNÇÃO PARA CARREGAR A IMAGEM EM BASE64 (com tratamento de erros)
+# FUNÇÃO PARA CARREGAR A IMAGEM EM BASE64 (para exibição no site)
 def load_logo_as_base64():
     """
     Tenta carregar a imagem e converter para Base64.
@@ -35,13 +35,18 @@ def load_logo_as_base64():
                 return f"data:image/{mime_type};base64,{encoded_string}"
                 
             except Exception as e:
-                # Log silencioso para produção
                 pass
     
-    return None  # Retorna None se não encontrar imagem
+    return None
 
-# Carregar a imagem
+# Carregar a imagem base64 para uso no site
 LOGO_BASE64 = load_logo_as_base64()
+
+# URL PÚBLICA da sua imagem (você PRECISA disso para o WhatsApp)
+# Opção 1: Hospedar a imagem em um serviço como Imgur, Cloudinary, etc.
+# Opção 2: Criar uma rota no Flask para servir a imagem (recomendado)
+SITE_URL = "https://crypto-masterclass.vercel.app/"  # SUBSTITUA PELO SEU URL REAL
+IMAGE_URL = f"{SITE_URL}/static/og-image.jpg"  # URL pública da imagem
 
 TEMPLATE = """
 <!doctype html>
@@ -49,10 +54,33 @@ TEMPLATE = """
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    <!-- META TAGS BÁSICAS -->
     <meta name="description" content="Curso completo de criptomoedas para iniciantes. Aprenda a investir com segurança e domine o mercado cripto.">
     <title>Curso de Criptomoedas para Iniciantes | Domine o Mercado Digital</title>
+    
+    <!-- OPEN GRAPH TAGS - CRUCIAIS PARA O WHATSAPP -->
+    <meta property="og:title" content="Curso de Criptomoedas para Iniciantes">
+    <meta property="og:description" content="Aprenda do zero ao avançado como investir com segurança e maximizar seus lucros no universo cripto. Oferta especial por tempo limitado!">
+    <meta property="og:image" content="{{ image_url }}">
+    <meta property="og:url" content="{{ site_url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Curso de Criptomoedas">
+    <meta property="og:locale" content="pt_BR">
+    
+    <!-- META TAGS OPCIONAIS PARA WHATSAPP -->
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Curso de Criptomoedas para Iniciantes">
+    
+    <!-- TWITTER CARDS (para compatibilidade) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Curso de Criptomoedas para Iniciantes">
+    <meta name="twitter:description" content="Aprenda do zero ao avançado como investir com segurança e maximizar seus lucros no universo cripto.">
+    <meta name="twitter:image" content="{{ image_url }}">
+    
     <style>
-        /* FUNDO GRADIENTE AZUL ANIMADO */
+        /* SEU CSS EXISTENTE - NÃO ALTERADO */
         @keyframes gradientMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -489,17 +517,23 @@ def index():
     return render_template_string(
         TEMPLATE, 
         affiliate=AFFILIATE_URL,
-        logo_base64=LOGO_BASE64
+        logo_base64=LOGO_BASE64,
+        image_url=IMAGE_URL,
+        site_url=SITE_URL
     )
 
-# Rota de health check (recomendada para Vercel)
+# Rota para servir a imagem OG (se você optar por hospedar localmente)
+@app.route('/static/og-image.jpg')
+def serve_og_image():
+    """Serve a imagem para o Open Graph"""
+    from flask import send_file
+    return send_file('og-image.jpg', mimetype='image/jpeg')
+
+# Rota de health check
 @app.route('/health')
 def health():
     return 'OK', 200
 
-# PONTO DE ENTRADA ÚNICO E CORRETO PARA VERCEL
-# Importante: apenas UM if __name__ == '__main__' no final
 if __name__ == '__main__':
-    # Usa porta da variável de ambiente (Vercel) ou 5000 localmente
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)  # debug=False para produção
+    app.run(host='0.0.0.0', port=port, debug=False)
